@@ -19,9 +19,9 @@ model = tf.keras.models.Sequential([
 ])
 
 # 옵티마이저와 손실 함수 선택
-model.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy',
-              metrics=['accuracy'])
+# model.compile(optimizer='adam',
+#               loss='sparse_categorical_crossentropy',
+#               metrics=['accuracy'])
 
 # logits
 predictions = model(x_train[:1]).numpy()
@@ -33,3 +33,22 @@ softmax_predictions = tf.nn.softmax(predictions).numpy()
 loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 untrained_loss = loss_fn(y_train[:1], predictions).numpy()
 print(untrained_loss)
+
+# 컴파일
+model.compile(optimizer='adam',
+              loss=loss_fn,
+              metrics=['accuracy'])
+
+# 모델 훈련
+model.fit(x_train, y_train, epochs=5)
+
+# 모델 성능 확인
+model.evaluate(x_test, y_test, verbose=2)
+
+# 확률
+probability_model = tf.keras.Sequential([
+    model,
+    tf.keras.layers.Softmax()
+])
+
+print(probability_model(x_test[:5]))
